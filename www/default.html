@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the Future</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 5rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: glow 2s infinite alternate;
+        }
+
+        p {
+            font-size: 1.5rem;
+            max-width: 800px;
+            margin: 20px auto;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            color: #00fffc;
+            font-weight: bold;
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float linear infinite;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: transparent;
+            color: white;
+            border: 2px solid #00fffc;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn:hover {
+            background: #00fffc;
+            color: #0f0c29;
+            box-shadow: 0 0 20px #00fffc;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            }
+            to {
+                text-shadow: 0 0 20px #00fffc, 0 0 30px #00fffc;
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="container">
+        <h1>Welcome to the <span class="highlight">Matrix</span></h1>
+        <p>You've entered a digital realm where creativity meets technology. This is not just a webpage - it's a <span class="highlight">gateway</span> to infinite possibilities.</p>
+        <a href="#" class="btn" id="actionBtn">Initiate Sequence</a>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 2px and 6px
+                const size = Math.random() * 4 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation duration
+                const duration = Math.random() * 20 + 10;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // Random delay
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Button click effect
+        document.getElementById('actionBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Change button text
+            this.textContent = 'Sequence Activated!';
+            
+            // Create a ripple effect
+            const ripple = document.createElement('div');
+            ripple.style.position = 'absolute';
+            ripple.style.width = '0';
+            ripple.style.height = '0';
+            ripple.style.backgroundColor = 'rgba(0, 255, 252, 0.3)';
+            ripple.style.borderRadius = '50%';
+            ripple.style.pointerEvents = 'none';
+            ripple.style.transform = 'translate(-50%, -50%)';
+            
+            const rect = this.getBoundingClientRect();
+            ripple.style.left = `${rect.left + rect.width/2}px`;
+            ripple.style.top = `${rect.top + rect.height/2}px`;
+            
+            document.body.appendChild(ripple);
+            
+            // Animate ripple
+            const size = Math.max(window.innerWidth, window.innerHeight) * 2;
+            const animation = ripple.animate([
+                { width: '0', height: '0', opacity: 1 },
+                { width: `${size}px`, height: `${size}px`, opacity: 0 }
+            ], {
+                duration: 1000,
+                easing: 'ease-out'
+            });
+            
+            animation.onfinish = () => ripple.remove();
+            
+            // Change background gradient
+            document.body.style.background = 'linear-gradient(135deg, #00fffc, #0082fc, #00fffc)';
+            
+            // Reset after 3 seconds
+            setTimeout(() => {
+                this.textContent = 'Initiate Sequence';
+                document.body.style.background = 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)';
+            }, 3000);
+        });
+
+        // Initialize particles on load
+        window.addEventListener('load', createParticles);
+    </script>
+</body>
+</html>

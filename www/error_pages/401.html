@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Error 401</title>
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #f0f6fc;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: radial-gradient(circle, #001f3f, #001a33);
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.15);
+            width: 90%;
+            max-width: 450px;
+            transition: 0.3s ease;
+        }
+
+        h1 {
+            font-size: 140px;
+            margin: 0;
+            background: linear-gradient(90deg, #00ffff, #00bfff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 15px #00ffff; }
+            to { text-shadow: 0 0 35px #00ffff; }
+        }
+
+        p {
+            font-size: 22px;
+            color: #a8b2d1;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .btn {
+            background: linear-gradient(90deg, #00ffff, #00bfff);
+            color: #0d1117;
+            padding: 14px 40px;
+            font-size: 18px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 255, 255, 0.4);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            outline: none;
+        }
+
+        .btn:hover {
+            background: linear-gradient(90deg, #00bfff, #00ffff);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 6px 25px rgba(0, 255, 255, 0.6);
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 90px;
+            }
+
+            p {
+                font-size: 18px;
+            }
+
+            .btn {
+                font-size: 16px;
+                padding: 12px 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>401</h1>
+    <p>Unauthorized – You need to login first.</p>
+    <button class="btn" onclick="window.location.href = '/'">Go Home</button>
+</div>
+
+</body>
+</html>

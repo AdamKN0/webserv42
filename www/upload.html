@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload - My Webserv</title>
+</head>
+<body>
+    <div class="container">
+        <h1>FILE UPLOAD</h1>
+        <div class="welcome-message">
+            Ready to contribute to our collection? Share your files with us.
+        </div>
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            <div class="file-drop-area">
+                <span>Drag & drop files here or click to browse</span>
+                <input type="file" name="file" id="file-input" required>
+            </div>
+            <div class="button-group">
+                <button type="submit">Upload</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoleServer Test Page</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to MoleServer</h1>
+        
+        <!-- GET Request Section -->
+        <div class="section">
+            <h2>GET Request Tests</h2>
+            <button onclick="window.location.href='/text.txt'">Get Text File</button>
+            <button onclick="window.location.href='/door.png'">Get Image</button>
+            <button onclick="window.location.href='/error_pages/404.html'">Test 404 Error</button>
+        </div>
+        <!-- Audio Player Section -->
+        <div class="section">
+            <h2>Audio Player</h2>
+            <audio controls>
+                <source src="/song.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <p><small>Note: Upload an audio file first using the POST form below</small></p>
+        </div>
+        <!-- Video Player Section -->
+        <div class="section">
+            <h2>Video Player</h2>
+            <video width="640" height="360" controls>
+                <source src="real.mp4" type="video/mp4">
+                Your browser does not support the video element.
+            </video>
+        </div>
+
+        <!-- POST Request Section -->
+        <div class="section">
+            <h2>POST Request Tests</h2>
+            <form method="post" enctype="multipart/form-data">
+                <h3>File Upload</h3>
+                <input type="file" name="file" required>
+                <button type="submit">Upload File</button>
+            </form>
+
+            <form method="post">
+                <h3>Text Submission</h3>
+                <input type="text" name="message" placeholder="Enter your message" required>
+                <button type="submit">Submit Text</button>
+            </form>
+        </div>
+
+        <!-- DELETE Request Section -->
+        <div class="section">
+            <h2>DELETE Request Tests</h2>
+            <input type="text" id="deleteFile" placeholder="Enter file name to delete">
+            <button class="delete-btn" onclick="deleteFile()">Delete File</button>
+        </div>
+    </div>
+
+    <script>
+        function deleteFile() {
+            const fileName = document.getElementById('deleteFile').value;
+            if (!fileName) {
+                alert('Please enter a file name');
+                return;
+            }
+
+            fetch('/' + fileName, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('File deleted successfully');
+                } else {
+                    alert('Error deleting file');
+                }
+            })
+            .catch(error => {
+                alert('Error: ' + error);
+            });
+        }
+    </script>
+</body>
+</html>
