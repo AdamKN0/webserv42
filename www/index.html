@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1337 - WebServer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #0a0c1b, #1a1b3a);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .floating-emojis {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-emoji {
+            position: absolute;
+            font-size: 24px;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+            100% {
+                transform: translateY(0) rotate(360deg);
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+            position: relative;
+        }
+        
+        .title {
+            font-size: 72px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00f2fe, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 20px;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+            text-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        }
+
+        @keyframes titleGlow {
+            0% {
+                text-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+            }
+            100% {
+                text-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
+            }
+        }
+        
+        .subtitle {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #f8fafc;
+            letter-spacing: -0.5px;
+            animation: subtitleFloat 3s ease-in-out infinite;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes subtitleFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.3);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link i {
+            font-size: 18px;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
+        }
+        
+        .nav-link:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 242, 254, 0.4);
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+        
+        .project-section {
+            background-color: rgba(10, 12, 27, 0.7);
+            border-radius: 24px;
+            padding: 60px;
+            margin-bottom: 60px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 242, 254, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 20px,
+                rgba(0, 242, 254, 0.05) 20px,
+                rgba(0, 242, 254, 0.05) 40px
+            );
+            animation: moveBg 20s linear infinite;
+        }
+
+        @keyframes moveBg {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #f8fafc;
+            position: relative;
+            display: inline-block;
+            animation: titleSlide 1s ease-out;
+        }
+
+        @keyframes titleSlide {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #00f2fe, #4facfe);
+            animation: lineGrow 1s ease-out;
+        }
+
+        @keyframes lineGrow {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+        
+        .project-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #94a3b8;
+            margin-bottom: 40px;
+            max-width: 800px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 242, 254, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: cardPop 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+
+        @keyframes cardPop {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(0, 242, 254, 0.05), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px) rotate(2deg);
+            box-shadow: 0 20px 40px rgba(0, 242, 254, 0.2);
+            border-color: rgba(0, 242, 254, 0.3);
+        }
+        
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-title i {
+            color: #00f2fe;
+        }
+        
+        .feature-description {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+        
+        .team-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .team-member {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 242, 254, 0.1);
+            position: relative;
+            overflow: hidden;
+            animation: cardPop 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .team-member::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(0, 242, 254, 0.05), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-5px) rotate(-2deg);
+            box-shadow: 0 20px 40px rgba(0, 242, 254, 0.2);
+            border-color: rgba(0, 242, 254, 0.3);
+        }
+        
+        .member-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+            border: 3px solid rgba(0, 242, 254, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .team-member:hover .member-image {
+            transform: scale(1.1) rotate(5deg);
+            border-color: rgba(0, 242, 254, 0.6);
+        }
+        
+        .member-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #f8fafc;
+        }
+        
+        .member-role {
+            color: #94a3b8;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 8px;
+            background: rgba(0, 242, 254, 0.1);
+            margin: 5px;
+        }
+
+        .member-role:hover {
+            color: #00f2fe;
+            background: rgba(0, 242, 254, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .member-role i {
+            margin-right: 5px;
+            color: #00f2fe;
+        }
+
+        .member-links {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        /* Add animation delays for cards */
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
+        .feature-card:nth-child(7) { animation-delay: 0.7s; }
+        .feature-card:nth-child(8) { animation-delay: 0.8s; }
+        .feature-card:nth-child(9) { animation-delay: 0.9s; }
+
+        .team-member:nth-child(1) { animation-delay: 1s; }
+        .team-member:nth-child(2) { animation-delay: 1.1s; }
+    </style>
+</head>
+<body>
+    <div class="floating-emojis" id="floatingEmojis"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1 class="title">1337</h1>
+            <p class="subtitle">WebServer</p>
+            <div class="nav-links">
+                <a href="/uploads/" class="nav-link"><i class="fas fa-upload"></i> Uploads</a>
+                <a href="/cgi/" class="nav-link"><i class="fas fa-code"></i> CGI</a>
+                <a href="/upload.html" class="nav-link"><i class="fas fa-file-upload"></i> Upload Page</a>
+                <a href="/error_pages/" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Error Pages</a>
+                <a href="/redirection/" class="nav-link"><i class="fas fa-exchange-alt"></i> Redirection</a>
+            </div>
+        </header>
+
+        <section class="team-section">
+            <h2 class="section-title">Our Team</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <img src="favicon.ico" alt="Team Member 1" class="member-image">
+                    <h3 class="member-name">ADAM</h3>
+                    <div class="member-links">
+                        <a href="https://github.com/AdamKN0" class="member-role" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                        <a href="https://www.linkedin.com/in/kenaoui-adam-876b06253" class="member-role" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                    </div>
+                </div>
+                <div class="team-member">
+                    <img src="favicon.ico" alt="Team Member 2" class="member-image">
+                    <h3 class="member-name">Wadia</h3>
+                    <div class="member-links">
+                        <a href="https://github.com/wadia05" class="member-role" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                        <a href="https://www.linkedin.com/in/wadia-ait-baba-arroub-b10230218" class="member-role" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="project-section">
+            <h2 class="section-title">About Our WebServer</h2>
+            <p class="project-description">
+                Our WebServer is a high-performance HTTP server implementation that supports various features including CGI, file uploads, redirections, and more. Built with efficiency and security in mind, it provides a robust platform for web applications.
+            </p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3 class="feature-title"><i class="fas fa-rocket"></i> HTTP/1.1 Support</h3>
+                    <p class="feature-description">Full implementation of HTTP/1.1 protocol with support for persistent connections, chunked transfer encoding, and proper request handling.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title"><i class="fas fa-bolt"></i> Non-Blocking I/O</h3>
+                    <p class="feature-description">Efficient multiplexing using non-blocking I/O operations for optimal performance and resource utilization.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title"><i class="fas fa-cogs"></i> Config Parser</h3>
+                    <p class="feature-description">Robust configuration file parser supporting server directives, location blocks, and custom error pages.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title"><i class="fas fa-file-upload"></i> File Operations</h3>
+                    <p class="feature-description">Comprehensive file handling including upload, download, and delete operations with proper permissions.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title"><i class="fas fa-exchange-alt"></i> Request Handler</h3>
+                    <p class="feature-description">Advanced request parsing and handling with support for various HTTP methods and headers.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title"><i class="fas fa-shield-alt"></i> Security</h3>
+                    <p class="feature-description">Built-in security features including input validation, proper error handling, and secure file operations.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title"><i class="fas fa-folder-open"></i> Autoindex</h3>
+                    <p class="feature-description">Automatic directory listing with customizable display options and proper file permissions.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title"><i class="fas fa-redo"></i> Redirection</h3>
+                    <p class="feature-description">Support for various types of HTTP redirections including 301 and 302 with proper header handling.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="feature-title"><i class="fas fa-terminal"></i> CGI Support</h3>
+                    <p class="feature-description">Full CGI implementation allowing execution of external programs and scripts with proper environment setup.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Create floating emojis
+        const emojis = ['🚀', '⚡', '🔧', '📤', '🔄', '🔒', '📂', '⚙️', '💻', '🌐', '🔌', '🔍', '🎮', '🎨', '🎯', '🎪'];
+        const container = document.getElementById('floatingEmojis');
+
+        function createEmoji() {
+            const emoji = document.createElement('div');
+            emoji.className = 'floating-emoji';
+            emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            
+            // Random position
+            emoji.style.left = Math.random() * 100 + 'vw';
+            emoji.style.top = Math.random() * 100 + 'vh';
+            
+            // Random animation duration
+            emoji.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            
+            container.appendChild(emoji);
+            
+            // Remove emoji after animation
+            setTimeout(() => {
+                emoji.remove();
+            }, 6000);
+        }
+
+        // Create initial emojis
+        for (let i = 0; i < 20; i++) {
+            setTimeout(() => {
+                createEmoji();
+            }, i * 300);
+        }
+
+        // Keep creating new emojis
+        setInterval(() => {
+            createEmoji();
+        }, 3000);
+    </script>
+</body>
+</html> 

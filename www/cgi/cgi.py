@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import os
-import syszasqsqsq
+import sys
 from http import cookies
 
 def print_request_info():
