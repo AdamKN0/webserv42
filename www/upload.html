@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload</title>
+    <title>File Manager</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -13,7 +14,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #0f172a;
@@ -24,14 +25,14 @@
             justify-content: center;
             overflow: hidden;
         }
-        
+
         .container {
             width: 900px;
             padding: 40px;
             text-align: center;
             position: relative;
         }
-        
+
         .title {
             font-size: 48px;
             font-weight: 700;
@@ -43,7 +44,7 @@
             position: relative;
             z-index: 2;
         }
-        
+
         .subtitle {
             font-size: 24px;
             font-weight: 600;
@@ -51,7 +52,7 @@
             color: #f8fafc;
             letter-spacing: -0.5px;
         }
-        
+
         .description {
             font-size: 16px;
             margin-bottom: 40px;
@@ -61,7 +62,7 @@
             margin-right: auto;
             line-height: 1.6;
         }
-        
+
         .content-box {
             position: relative;
             z-index: 2;
@@ -73,7 +74,7 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
         }
-        
+
         .upload-area {
             border: 2px dashed rgba(56, 189, 248, 0.3);
             border-radius: 16px;
@@ -85,7 +86,18 @@
             position: relative;
             overflow: hidden;
         }
-        
+
+        .delete-area {
+            border: 2px dashed rgba(248, 113, 113, 0.3);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            background: rgba(248, 113, 113, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
         .upload-area::before {
             content: '';
             position: absolute;
@@ -96,36 +108,65 @@
             background: linear-gradient(45deg, transparent, rgba(56, 189, 248, 0.05), transparent);
             animation: shimmer 3s infinite;
         }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+
+        .delete-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(248, 113, 113, 0.05), transparent);
+            animation: shimmer 3s infinite;
         }
-        
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
         .upload-area:hover {
             border-color: #38bdf8;
             background-color: rgba(56, 189, 248, 0.05);
             transform: translateY(-2px);
         }
-        
+
+        .delete-area:hover {
+            border-color: #f87171;
+            background-color: rgba(248, 113, 113, 0.05);
+        }
+
         .icon {
             font-size: 64px;
-            color: #38bdf8;
             margin-bottom: 20px;
+        }
+
+        .upload-icon {
+            color: #38bdf8;
             filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.3));
         }
-        
+
+        .delete-icon {
+            color: #f87171;
+            filter: drop-shadow(0 0 10px rgba(248, 113, 113, 0.3));
+        }
+
         .text {
             font-size: 18px;
             color: #f8fafc;
             margin-bottom: 10px;
         }
-        
+
         .hint {
             font-size: 14px;
             color: #94a3b8;
         }
-        
+
         .file-input {
             position: absolute;
             width: 100%;
@@ -135,30 +176,66 @@
             opacity: 0;
             cursor: pointer;
         }
-        
+
+        .path-input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .path-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .path-input:focus {
+            outline: none;
+            border-color: #f87171;
+            box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.2);
+        }
+
         .action-button {
             display: inline-block;
             padding: 16px 40px;
-            background: linear-gradient(135deg, #38bdf8, #818cf8);
             color: white;
             text-decoration: none;
             font-weight: 600;
             border-radius: 12px;
             transition: all 0.3s ease;
-            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
             border: none;
             cursor: pointer;
             font-size: 16px;
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
-        
-        .action-button:hover {
+
+        .upload-button {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
+        }
+
+        .upload-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(56, 189, 248, 0.4);
             background: linear-gradient(135deg, #3b82f6, #8b5cf6);
         }
-        
+
+        .delete-button {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            box-shadow: 0 10px 25px rgba(248, 113, 113, 0.3);
+        }
+
+        .delete-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(248, 113, 113, 0.4);
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
         .selected-files {
             margin-top: 20px;
             text-align: left;
@@ -166,7 +243,7 @@
             overflow-y: auto;
             padding: 0 20px;
         }
-        
+
         .file-item {
             display: flex;
             align-items: center;
@@ -176,12 +253,12 @@
             margin-bottom: 8px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .file-icon {
             margin-right: 12px;
             color: #38bdf8;
         }
-        
+
         .file-name {
             flex-grow: 1;
             text-align: left;
@@ -190,13 +267,13 @@
             white-space: nowrap;
             color: #f8fafc;
         }
-        
+
         .file-size {
             color: #94a3b8;
             margin-left: 12px;
             font-size: 14px;
         }
-        
+
         .team-grid {
             position: absolute;
             bottom: -100px;
@@ -208,7 +285,7 @@
             gap: 20px;
             z-index: 1;
         }
-        
+
         .team-block {
             width: 80px;
             height: 80px;
@@ -219,49 +296,51 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .team-block:nth-child(1) {
             background: rgba(56, 189, 248, 0.2);
             animation-delay: 0s;
         }
-        
+
         .team-block:nth-child(2) {
             background: rgba(99, 102, 241, 0.2);
             animation-delay: 0.5s;
         }
-        
+
         .team-block:nth-child(3) {
             background: rgba(14, 165, 233, 0.2);
             animation-delay: 1s;
         }
-        
+
         .team-block:nth-child(4) {
             background: rgba(129, 140, 248, 0.2);
             animation-delay: 1.5s;
         }
-        
+
         .team-block:nth-child(5) {
             background: rgba(56, 189, 248, 0.2);
             animation-delay: 2s;
         }
-        
+
         .team-block:nth-child(6) {
             background: rgba(99, 102, 241, 0.2);
             animation-delay: 2.5s;
         }
-        
+
         @keyframes float {
             0% {
                 transform: translateY(0px) rotate(0deg);
             }
+
             50% {
                 transform: translateY(-20px) rotate(5deg);
             }
+
             100% {
                 transform: translateY(0px) rotate(0deg);
             }
         }
-        
+
         .glowing-circle {
             position: absolute;
             width: 300px;
@@ -271,25 +350,25 @@
             z-index: 0;
             filter: blur(30px);
         }
-        
+
         .circle-1 {
             top: -100px;
             right: -50px;
         }
-        
+
         .circle-2 {
             bottom: -100px;
             left: -50px;
             background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(15, 23, 42, 0) 70%);
         }
-        
+
         .grid-bg {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             background-size: 20px 20px;
@@ -302,38 +381,118 @@
             justify-content: center;
             margin-top: 20px;
         }
+
+        .mode-switch {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .mode-button {
+            padding: 12px 24px;
+            background: rgba(15, 23, 42, 0.8);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .mode-button.upload {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .mode-button.delete {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .mode-button.active.upload {
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            color: white;
+            border-color: transparent;
+        }
+
+        .mode-button.active.delete {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            color: white;
+            border-color: transparent;
+        }
+
+        .form-container {
+            display: none;
+        }
+
+        .form-container.active {
+            display: block;
+        }
     </style>
 </head>
+
 <body>
     <div class="grid-bg"></div>
     <div class="glowing-circle circle-1"></div>
     <div class="glowing-circle circle-2"></div>
-    
+
     <div class="container">
         <div class="content-box">
-            <h1 class="title">File Upload</h1>
-            <h2 class="subtitle">Drag & Drop or Click to Upload</h2>
-            <p class="description">
-                Upload your files securely. All file types are supported.
-            </p>
-            
-            <form method="POST" enctype="multipart/form-data" id="uploadForm">
-                <div class="upload-area">
-                    <input type="file" name="files" multiple required class="file-input" id="fileInput">
-                    <div class="icon">📁</div>
-                    <p class="text">Choose files to upload</p>
-                    <p class="hint">or drag and drop files here</p>
-                </div>
-                
-                <div class="selected-files" id="selectedFiles"></div>
-                
-                <div class="button-group">
-                    <button type="submit" class="action-button">Upload Files</button>
-                    <a href="/" class="action-button">Go to Home</a>
-                </div>
-            </form>
+            <h1 class="title">File Manager</h1>
+
+            <div class="mode-switch">
+                <button type="button" class="mode-button upload active" id="uploadModeBtn">Upload Files</button>
+                <button type="button" class="mode-button delete" id="deleteModeBtn">Delete Files</button>
+            </div>
+
+            <!-- Upload Form -->
+            <div class="form-container active" id="uploadFormContainer">
+                <h2 class="subtitle">Drag & Drop or Click to Upload</h2>
+                <p class="description">
+                    Upload your files securely. All file types are supported.
+                </p>
+
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="upload-area">
+                        <input type="file" name="files" multiple required class="file-input" id="fileInput">
+                        <div class="icon upload-icon">📁</div>
+                        <p class="text">Choose files to upload</p>
+                        <p class="hint">or drag and drop files here</p>
+                    </div>
+
+                    <div class="selected-files" id="selectedFiles"></div>
+
+                    <div class="button-group">
+                        <button type="submit" class="action-button upload-button">Upload Files</button>
+                        <a href="/" class="action-button upload-button">Go to Home</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Delete Form -->
+            <div class="form-container" id="deleteFormContainer">
+                <h2 class="subtitle">Delete Files or Folders</h2>
+                <p class="description">
+                    Enter the path of the file or folder you want to delete.
+                </p>
+
+                <form method="POST" id="deleteForm">
+                    <div class="delete-area">
+                        <div class="icon delete-icon">🗑️</div>
+                        <p class="text">Enter path to delete</p>
+                        <p class="hint">Example: /path/to/file.txt or /path/to/folder</p>
+                        <input type="text" name="path" class="path-input" id="pathInput"
+                            placeholder="/path/to/file_or_folder" required>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="action-button delete-button">Delete</button>
+                        <a href="/" class="action-button delete-button">Go to Home</a>
+                    </div>
+                </form>
+            </div>
         </div>
-        
+
         <div class="team-grid">
             <div class="team-block"></div>
             <div class="team-block"></div>
@@ -348,31 +507,41 @@
         const fileInput = document.getElementById('fileInput');
         const selectedFiles = document.getElementById('selectedFiles');
         const uploadForm = document.getElementById('uploadForm');
+        const deleteForm = document.getElementById('deleteForm');
+        const uploadModeBtn = document.getElementById('uploadModeBtn');
+        const deleteModeBtn = document.getElementById('deleteModeBtn');
+        const uploadFormContainer = document.getElementById('uploadFormContainer');
+        const deleteFormContainer = document.getElementById('deleteFormContainer');
+        const pathInput = document.getElementById('pathInput');
 
+        // Event Listeners
         fileInput.addEventListener('change', handleFileSelect);
-        uploadForm.addEventListener('submit', handleFormSubmit);
+        uploadForm.addEventListener('submit', handleUploadSubmit);
+        deleteForm.addEventListener('submit', handleDeleteSubmit);
+        uploadModeBtn.addEventListener('click', switchToUploadMode);
+        deleteModeBtn.addEventListener('click', switchToDeleteMode);
 
         function handleFileSelect(event) {
             const files = event.target.files;
             selectedFiles.innerHTML = '';
-            
+
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
-                
+
                 const fileIcon = document.createElement('span');
                 fileIcon.className = 'file-icon';
                 fileIcon.textContent = '📄';
-                
+
                 const fileName = document.createElement('span');
                 fileName.className = 'file-name';
                 fileName.textContent = file.name;
-                
+
                 const fileSize = document.createElement('span');
                 fileSize.className = 'file-size';
                 fileSize.textContent = formatFileSize(file.size);
-                
+
                 fileItem.appendChild(fileIcon);
                 fileItem.appendChild(fileName);
                 fileItem.appendChild(fileSize);
@@ -388,21 +557,67 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        function handleFormSubmit(event) {
+        function handleUploadSubmit(event) {
             const files = fileInput.files;
             if (files.length === 0) {
                 event.preventDefault();
                 alert('Please select at least one file to upload');
                 return;
             }
-            
+
             const fileNames = Array.from(files).map(file => file.name).join('\n');
             const confirmUpload = confirm(`Are you sure you want to upload these files?\n\n${fileNames}`);
-            
+
             if (!confirmUpload) {
                 event.preventDefault();
             }
         }
+
+        function handleDeleteSubmit(event) {
+            event.preventDefault();
+            const path = pathInput.value.trim();
+
+            if (!path) {
+                alert('Please enter a valid path');
+                return;
+            }
+
+            const confirmDelete = confirm(`Are you sure you want to delete: ${path}?\nThis action cannot be undone.`);
+
+            if (confirmDelete) {
+                // Modified section: Use DELETE method and path in URL
+                fetch(path, {
+                    method: 'DELETE',
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert(`Successfully deleted: ${path}`);
+                            pathInput.value = '';
+                        } else {
+                            alert(`Error deleting: ${response.statusText}`);
+                        }
+                    })
+                    .catch(error => {
+                        alert(`Error: ${error.message}`);
+                    });
+            }
+        }
+
+
+        function switchToUploadMode() {
+            uploadModeBtn.classList.add('active');
+            deleteModeBtn.classList.remove('active');
+            uploadFormContainer.classList.add('active');
+            deleteFormContainer.classList.remove('active');
+        }
+
+        function switchToDeleteMode() {
+            deleteModeBtn.classList.add('active');
+            uploadModeBtn.classList.remove('active');
+            deleteFormContainer.classList.add('active');
+            uploadFormContainer.classList.remove('active');
+        }
     </script>
 </body>
-</html> 
+
+</html>

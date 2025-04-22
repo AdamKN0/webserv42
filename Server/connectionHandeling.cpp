@@ -65,7 +65,7 @@ std::string Connection::GetHeaderResponse()
     else if (extension == "avi")
         contentType = "video/x-msvideo";
     else
-        contentType = "text/plain"; 
+        contentType = "text/plain";
     // Build HTTP response header
     std::stringstream ss;
     ss << "HTTP/1.1 " << this->status_code << " " << GetStatusMessage() << "\r\n";
@@ -131,12 +131,12 @@ void Connection::GetStateFilePath(Config &config)
         }
     }
     if (this->path.empty())
-        this->path = "www/error_pages/default.html";
+        this->path = "www/error_pages/default_error.html";
     this->readFormFile->open(this->path.c_str(), std::ios::in | std::ios::binary);
     if (!this->readFormFile->is_open())
     {
         print_message("Failed to open error file", RED);
-        this->path = "www/error_pages/default.html";
+        this->path = "www/error_pages/default_error.html";
         this->readFormFile->open(this->path.c_str(), std::ios::in | std::ios::binary);
         if (!this->readFormFile->is_open())
         {
@@ -149,4 +149,3 @@ void Connection::GetStateFilePath(Config &config)
     this->content_length = st.st_size;
     return;
 }
-

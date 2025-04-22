@@ -113,7 +113,6 @@ void Run::readRequest(Connection *conn)
         conn->state = Connection::CLOSING;
         return;
     }
-    buffer[read_bytes] = '\0'; 
     conn->read_buffer.append(buffer, read_bytes);
     conn->total_received += read_bytes;
     if (conn->content_length == 0) {
@@ -201,8 +200,6 @@ void Run::parseRequest(Connection *conn)
             conn->is_redection = true;
             conn->status_code = request.getStatusCode();
             conn->response = request.getLocationRedirect();
-            print_message("Redirecting to: " + conn->response, YELLOW);
-            print_message("Status code: " + itosg(conn->status_code), YELLOW);
             conn->GetStateFilePath(this->configs[servers[this->currIndexServer]->getconnfig_index()]);
             conn->state = Connection::WRITING;
             return;
@@ -238,6 +235,9 @@ void Run::parseRequest(Connection *conn)
             {
 
                 conn->status_code = cgi.getStatus();
+                conn->GetStateFilePath(this->configs[servers[this->currIndexServer]->getconnfig_index()]);
+                conn->state = Connection::WRITING;
+                return;
             }
             else
             {
@@ -378,8 +378,8 @@ void Run::cleanup(){
         close(epoll_fd);
     }
     configs.clear();
-    print_message("BYE BYE", RED);
-    print_message("Server shut down", CYAN);
+
+    print_message("👋 BYE BYE 🔒 Server shut down", CYAN);
 }
 
 Run::~Run()
@@ -409,8 +409,7 @@ Run::~Run()
     }
     
     configs.clear();
-    print_message("BYE BYE", RED);
-    print_message("Server shut down", CYAN);
+    print_message("👋 BYE BYE 🔒 Server shut down", CYAN);
 }
 
 void resetClient(Connection *conn)
