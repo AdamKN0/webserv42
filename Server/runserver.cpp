@@ -7,15 +7,14 @@ Run::Run(char **av)
     config.parseConfig(file);
     configs = config.getConfigs();
     print_message("🛠️  Parsing config file... ✅ Done!", CYAN);
-    try
-    {
+    
+    try {
         for (size_t i = 0; i < configs.size(); i++)
         {
             for (size_t j = 0; j < configs[i].getPort().size(); j++)
             {
                 Server *server = new Server();
-                try
-                {
+                try {
                     server->setPort(std::atoi(configs[i].getPort()[j].c_str()));
                     server->setServerName(configs[i].getServerName()[0]);
                     server->setServerIp(configs[i].getHost()[0]);
@@ -23,27 +22,26 @@ Run::Run(char **av)
                     server->setroot(configs[i].getDefaultRoot()[0]);
                     server->setconnfig_index(i);
                     servers.push_back(server);
-                }
-                catch (...)
-                {
-                    delete server;
-                    throw;
+                } catch (...) {
+                    delete server; // Clean up in case of exception
+                    throw; // Re-throw the exception
                 }
             }
         }
+        
         print_message("🚧 Setting up servers...", YELLOW);
         epoll_fd = epoll_create(1);
         if (epoll_fd < 0)
             throw std::runtime_error("Failed to create epoll");
         this->connections.resize(servers.size());
         this->createServer();
-    }
-    catch (...)
-    {
-        for (size_t i = 0; i < servers.size(); i++)
+    } catch (...) {
+        // Clean up any servers that were created before the exception
+        for (size_t i = 0; i < servers.size(); i++) {
             delete servers[i];
+        }
         servers.clear();
-        throw;
+        throw; // Re-throw the exception
     }
 }
 
@@ -75,6 +73,7 @@ void Run::createServer()
     print_message("🎉 All servers are up and running smoothly! 🚀", MAGENTA);
 }
 
+
 bool Run::handleConnection(int fd, int j)
 {
     struct sockaddr_in client_addr;
@@ -91,52 +90,42 @@ bool Run::handleConnection(int fd, int j)
 }
 void Run::readRequest(Connection *conn)
 {
-    if (conn->fd <= 0)
-    {
+    if (conn->fd <= 0) {
         print_message("❌ No socket available", RED);
         conn->state = Connection::CLOSING;
         return;
     }
-    if (!conn)
-    {
+    if (!conn){
         print_message("❌ Connection object is NULL", RED);
         conn->state = Connection::CLOSING;
         return;
     }
     char buffer[BUFFER_SIZE];
     int read_bytes = recv(conn->fd, buffer, sizeof(buffer), MSG_NOSIGNAL);
-    if (read_bytes < 0)
-    {
+    if (read_bytes < 0) {
         print_message("❌ Failed to read from socket", RED);
         conn->state = Connection::CLOSING;
         return;
     }
 
-    if (read_bytes == 0)
-    {
+    if (read_bytes == 0) {
         print_message("❌ Connection closed by client", RED);
         conn->state = Connection::CLOSING;
         return;
     }
-    buffer[read_bytes] = '\0';
+    buffer[read_bytes] = '\0'; 
     conn->read_buffer.append(buffer, read_bytes);
     conn->total_received += read_bytes;
-    if (conn->content_length == 0)
-    {
+    if (conn->content_length == 0) {
         const std::string content_length_header = "Content-Length: ";
         size_t pos = conn->read_buffer.find(content_length_header);
-        if (pos != std::string::npos)
-        {
+        if (pos != std::string::npos) {
             size_t start = pos + content_length_header.length();
             size_t end = conn->read_buffer.find("\r\n", start);
-            if (end != std::string::npos)
-            {
-                try
-                {
+            if (end != std::string::npos) {
+                try {
                     conn->content_length = stolg(conn->read_buffer.substr(start, end - start));
-                }
-                catch (const std::exception &e)
-                {
+                } catch (const std::exception& e) {
                     print_message("❌ Error parsing Content-Length: " + itosg(e.what()), RED);
                     close_connection(conn);
                     return;
@@ -148,28 +137,24 @@ void Run::readRequest(Connection *conn)
     {
         print_message("❌ Content-Length exceeds maximum limit", RED);
         conn->state = Connection::POSSESSING;
-        conn->keep_alive = false;
+        conn->keep_alive = false; 
         conn->status_code = 413;
         mod_epoll(conn->fd, EPOLLOUT);
     }
-    else if (conn->content_length > 0)
-    {
+    else if (conn->content_length > 0) {
         size_t header_end = conn->read_buffer.find("\r\n\r\n");
-        if (header_end != std::string::npos)
-        {
+        if (header_end != std::string::npos) {
             size_t header_size = header_end + 4;
-            if (conn->read_buffer.size() >= header_size + conn->content_length)
-            {
+            if (conn->read_buffer.size() >= header_size + conn->content_length) {
                 conn->state = Connection::POSSESSING;
                 mod_epoll(conn->fd, EPOLLOUT);
             }
         }
-    }
-    else if (conn->content_length == 0)
-    {
+    }else if (conn->content_length == 0) {
         conn->state = Connection::POSSESSING;
         mod_epoll(conn->fd, EPOLLOUT);
     }
+
 }
 void setReqType(Connection *conn, HTTPRequest request)
 {
@@ -193,8 +178,8 @@ void Run::possessRequest(Connection *conn, HTTPRequest &request)
         this->DELETE_hander(conn, request);
     else
     {
-        print_message("❌ Invalid request method", RED);
         conn->status_code = 400;
+        print_message("Unknown request", RED);
     }
     conn->GetStateFilePath(this->configs[servers[this->currIndexServer]->getconnfig_index()]);
     conn->state = Connection::WRITING;
@@ -204,8 +189,7 @@ void Run::parseRequest(Connection *conn)
 {
     HTTPRequest request;
     int confidx = this->servers[this->currIndexServer]->getconnfig_index();
-    if (!request.parse_request(conn->read_buffer, configs[confidx]))
-    {
+    if (!request.parse_request(conn->read_buffer,configs[confidx])) {
         conn->write_buffer.clear();
         conn->path = "";
         conn->status_code = request.getStatusCode();
@@ -217,6 +201,8 @@ void Run::parseRequest(Connection *conn)
             conn->is_redection = true;
             conn->status_code = request.getStatusCode();
             conn->response = request.getLocationRedirect();
+            print_message("Redirecting to: " + conn->response, YELLOW);
+            print_message("Status code: " + itosg(conn->status_code), YELLOW);
             conn->GetStateFilePath(this->configs[servers[this->currIndexServer]->getconnfig_index()]);
             conn->state = Connection::WRITING;
             return;
@@ -234,6 +220,7 @@ void Run::parseRequest(Connection *conn)
             if (conn->response.empty())
             {
                 conn->status_code = 400;
+                print_message("Error: Autoindex path is empty", RED);
                 conn->GetStateFilePath(this->configs[servers[this->currIndexServer]->getconnfig_index()]);
                 conn->state = Connection::WRITING;
                 return;
@@ -242,15 +229,15 @@ void Run::parseRequest(Connection *conn)
             conn->state = Connection::WRITING;
             return;
         }
+
+
         CGI cgi;
         if (cgi.is_cgi(request.getPath(), this->configs[confidx], request.getInLocation()) && request.isUpload() == false)
         {
             if (!cgi.exec_cgi(request, conn->response))
             {
+
                 conn->status_code = cgi.getStatus();
-                conn->GetStateFilePath(this->configs[servers[this->currIndexServer]->getconnfig_index()]);
-                conn->state = Connection::WRITING;
-                return;
             }
             else
             {
@@ -258,10 +245,12 @@ void Run::parseRequest(Connection *conn)
                 conn->status_code = cgi.getStatus();
             }
         }
+
     }
     conn->read_buffer.clear();
     setReqType(conn, request);
     possessRequest(conn, request);
+
 }
 void Run::handleRequest(Connection *conn)
 {
@@ -321,7 +310,7 @@ void Run::runServer()
         {
             std::vector<int> expired_fds;
             for (std::map<int, Connection *>::iterator it = this->connections[j].begin();
-                 it != this->connections[j].end(); ++it)
+                it != this->connections[j].end(); ++it)
             {
                 if (current_time - it->second->last_active > KEEP_ALIVE_TIMEOUT)
                     expired_fds.push_back(it->first);
@@ -331,7 +320,7 @@ void Run::runServer()
                 std::map<int, Connection *>::iterator it = this->connections[j].find(expired_fds[i]);
                 if (it != this->connections[j].end())
                 {
-                    print_message("🕒 Closing expired connection " + itosg(it->first) + " on server " + itosg(j), YELLOW);
+                    print_message("Closing expired connection " + itosg(it->first) + " on server " + itosg(j), YELLOW);
                     Connection *conn = it->second;
                     close_connection(conn);
                 }
@@ -364,8 +353,7 @@ void Run::remove_from_epoll(int fd)
     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL);
 }
 
-void Run::cleanup()
-{
+void Run::cleanup(){
 
     for (size_t i = 0; i < servers.size(); i++)
     {
@@ -376,11 +364,11 @@ void Run::cleanup()
 
     for (size_t i = 0; i < connections.size(); i++)
     {
-        for (std::map<int, Connection *>::iterator it = connections[i].begin();
+        for (std::map<int, Connection *>::iterator it = connections[i].begin(); 
              it != connections[i].end(); ++it)
         {
-            close(it->first);
-            delete it->second;
+            close(it->first); 
+            delete it->second; 
         }
         connections[i].clear();
     }
@@ -390,61 +378,81 @@ void Run::cleanup()
         close(epoll_fd);
     }
     configs.clear();
-    print_message("👋 BYE BYE 🌟 Server shut down gracefully 🚀", CYAN);
+    print_message("BYE BYE", RED);
+    print_message("Server shut down", CYAN);
 }
 
 Run::~Run()
 {
+    // Clean up servers
     for (size_t i = 0; i < servers.size(); i++)
     {
-        close(servers[i]->getserverfd());
+        close(servers[i]->getserverfd()); 
         delete servers[i];
     }
     servers.clear();
+
     for (size_t i = 0; i < connections.size(); i++)
     {
-        for (std::map<int, Connection *>::iterator it = connections[i].begin();
+        for (std::map<int, Connection *>::iterator it = connections[i].begin(); 
              it != connections[i].end(); ++it)
         {
-            close(it->first);
-            delete it->second;
+            close(it->first); 
+            delete it->second; 
         }
         connections[i].clear();
     }
 
     if (epoll_fd > 0)
+    {
         close(epoll_fd);
+    }
+    
     configs.clear();
-    print_message("👋 BYE BYE 🌟 Server shut down gracefully 🚀", CYAN);
+    print_message("BYE BYE", RED);
+    print_message("Server shut down", CYAN);
 }
 
 void resetClient(Connection *conn)
 {
+    // Safely close the file if it's open
     if (conn->readFormFile && conn->readFormFile->is_open())
+    {
         conn->readFormFile->close();
+    }
+
+    // Reset string buffers
     conn->read_buffer.clear();
     conn->write_buffer.clear();
     conn->path.clear();
     conn->query.clear();
     conn->upload_path.clear();
     conn->response.clear();
+
+    // Reset state variables
     conn->method = NOTDETECTED;
     conn->last_active = time(0);
     conn->content_length = 0;
     conn->total_sent = 0;
     conn->total_received = 0;
     conn->status_code = 200;
+
+    // Reset connection flags
     conn->keep_alive = true;
     conn->headersSend = false;
     conn->chunked = false;
     conn->state = Connection::READING;
     conn->is_cgi = false;
+    
+    // Reset file stream properly
     if (conn->readFormFile)
     {
         delete conn->readFormFile;
         conn->readFormFile = new std::ifstream();
     }
-    print_message("🔄 Client connection reset", GREEN);
+
+    print_message("Client connection reset", GREEN);
+    
 }
 void Run::sendResponse(Connection *conn)
 {
@@ -515,124 +523,144 @@ void Run::close_connection(Connection *conn)
         std::map<int, Connection *>::iterator it = connections[i].find(fd);
         if (it != connections[i].end())
         {
-            delete it->second;
+            delete it->second; 
             connections[i].erase(it);
         }
     }
-    print_message("🔒 Closing connection: " + itosg(fd), MAGENTA);
+    print_message("Closing connection: " + itosg(fd), MAGENTA);
 }
 
-int Run::GET_hander(Connection *conn, HTTPRequest &request) { return (conn->path = request.getPath(), 0); }
-int Run::POST_hander(Connection *conn, HTTPRequest &request) { return (conn->path = request.getPath(), 0); }
 
+// << =================== Methods for Server =================== >> //
+
+int Run::GET_hander(Connection *conn, HTTPRequest &request)
+{
+
+    conn->path = request.getPath();
+    return 0;
+}
+
+int Run::POST_hander(Connection *conn,  HTTPRequest &request)
+{
+    conn->path = request.getPath();
+    return 0;
+}
 void deleteFile(std::string path)
 {
+
+    // Check if file exists before attempting to delete
     if (access(path.c_str(), F_OK) != 0)
     {
-        print_message("❌ File does not exist: " + path, RED);
+        print_message("File does not exist: " + path, RED);
         return;
     }
+
+    // Check if we have write permission to delete the file
     if (access(path.c_str(), W_OK) != 0)
     {
-        print_message("🚫 No permission to delete file: " + path, RED);
+        print_message("No permission to delete file: " + path, RED);
         return;
     }
+
+    // Attempt to delete the file
     if (std::remove(path.c_str()) != 0)
-        print_message("⚠️ Error deleting file: " + path, RED);
+    {
+        print_message("Error deleting file: " + path, RED);
+    }
     else
-        print_message("✅ File deleted successfully: " + path, GREEN);
+    {
+        print_message("File deleted successfully: " + path, GREEN);
+    }
 }
 void deletedir(std::string path)
 {
+    // Check if directory exists before attempting to delete
     if (access(path.c_str(), F_OK) != 0)
     {
-        print_message("❌ Directory does not exist: " + path, RED);
+        print_message("Directory does not exist: " + path, RED);
         return;
     }
+    // Check if we have write permission to delete the directory
     if (access(path.c_str(), W_OK) != 0)
     {
-        print_message("🚫 No permission to delete directory: " + path, RED);
+        print_message("No permission to delete directory: " + path, RED);
         return;
     }
-    DIR *dir = opendir(path.c_str());
-    if (dir == NULL)
-    {
-        print_message("⚠️ Error opening directory: " + path, RED);
+
+    // Attempt to delete the directory
+    DIR* dir = opendir(path.c_str());
+    if (dir == NULL) {
+        print_message("Error opening directory: " + path, RED);
         return;
     }
-    dirent *entry;
-    while ((entry = readdir(dir)) != NULL)
-    {
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-            continue;
-        if (entry->d_type == DT_DIR)
-        {
+
+    dirent* entry;
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue; // Skip the current and parent directory entries
+        }
+        if (entry->d_type == DT_DIR) {
+            // Recursively delete subdirectories
             std::string subdir_path = path + "/" + entry->d_name;
             deletedir(subdir_path);
-            std::remove(subdir_path.c_str());
-        }
-        else
-        {
+            std::remove(subdir_path.c_str()); // Remove the empty subdirectory
+        } else {
+            // Delete files
             std::string file_path = path + "/" + entry->d_name;
             deleteFile(file_path);
         }
     }
-    closedir(dir);
-    if (std::remove(path.c_str()) == 0)
-        print_message("✅ Directory deleted successfully: " + path, GREEN);
-    else
-        print_message("⚠️ Error deleting directory: " + path, RED);
-}
 
+    closedir(dir);
+
+    // Delete the current directory
+    std::remove(path.c_str());
+}
 int Run::DELETE_hander(Connection *conn, HTTPRequest &request)
 {
     struct stat path_stat;
-
-    if (stat(request.getPath().c_str(), &path_stat) != 0)
-        return (print_message("❌ File or directory not found: " + request.getPath(), RED), conn->status_code = 404, false);
-
+    
+    if (stat(request.getPath().c_str(), &path_stat) != 0) {
+        print_message("File or directory not found", RED);
+        conn->status_code = 404; // Not Found
+        return false;
+    }
+    
     bool success = true;
-
-    if (S_ISREG(path_stat.st_mode))
-    {
-        print_message("🗑️ Deleting file: " + request.getPath(), YELLOW);
-        if (std::remove(request.getPath().c_str()) != 0)
-        {
-            print_message("❌ Error deleting file: " + request.getPath(), RED);
+    if (S_ISREG(path_stat.st_mode)) {
+        print_message("Deleting file", YELLOW);
+        if (std::remove(request.getPath().c_str()) != 0) {
+            print_message("Error deleting file: " + request.getPath(), RED);
             success = false;
-            conn->status_code = 403;
+            conn->status_code = 403; // Forbidden if permission issue
         }
-    }
-    else if (S_ISDIR(path_stat.st_mode))
-    {
-        print_message("📂 Deleting directory: " + request.getPath(), YELLOW);
-        try
-        {
+    } else if (S_ISDIR(path_stat.st_mode)) {
+        print_message("Deleting directory", YELLOW);
+        try {
             deletedir(request.getPath());
-            if (access(request.getPath().c_str(), F_OK) == 0)
-            {
-                print_message("❌ Directory still exists after deletion attempt: " + request.getPath(), RED);
+            if (access(request.getPath().c_str(), F_OK) == 0) {
+                print_message("Directory still exists after deletion attempt", RED);
+                // If directory still exists after deletion attempt
                 success = false;
-                conn->status_code = 500;
+                conn->status_code = 500; // Internal Server Error
             }
-        }
-        catch (const std::exception &e)
-        {
-            print_message("❌ Error deleting directory: " + request.getPath(), RED);
+        } catch (const std::exception& e) {
+            print_message("Error deleting directory: " + request.getPath(), RED);
             success = false;
-            conn->status_code = 500;
+            conn->status_code = 500; // Internal Server Error
         }
+    } else {
+        print_message("Unsupported file type", RED);
+        conn->status_code = 400; // Bad Request
+        return false;
     }
-    else
-        return (print_message("❌ Unsupported file type: " + request.getPath(), RED), conn->status_code = 400, false);
-
-    if (success)
-    {
-        conn->status_code = 204;
-        print_message("✅ Delete operation successful: " + request.getPath(), GREEN);
+    
+    if (success) {
+        conn->status_code = 204; // No Content - successful deletion
+        print_message("Delete operation successful", GREEN);
+    } else {
+        print_message("Delete operation failed", RED);
     }
-    else
-        print_message("❌ Delete operation failed: " + request.getPath(), RED);
-
+    
     return 0;
 }

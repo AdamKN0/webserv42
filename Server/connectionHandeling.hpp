@@ -12,9 +12,13 @@ enum Method
     NOTDETECTED
 };
 
+
+
+
 class Connection
 {
-public:
+    public:
+    
     enum State
     {
         READING,
@@ -27,6 +31,7 @@ public:
     int fd;
     int status_code;
     bool is_redection;
+
 
     std::string read_buffer;
     std::string write_buffer;
@@ -56,4 +61,5 @@ public:
     std::string GetContentType();
     std::string GetStatusMessage();
     void GetStateFilePath(Config &config);
+ 
 };

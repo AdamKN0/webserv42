@@ -31,7 +31,7 @@
 #include <signal.h>
 #include "Config/Tokenizer.hpp"
 #include "Config/Config.hpp"
-#include "req/HTTPRequest.hpp"
+#include "Req/HTTPRequest.hpp"
 #include "CGI/CGI.hpp"
 #include "Server/runserver.hpp"
 

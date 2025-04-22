@@ -7,9 +7,9 @@
       "request": "launch",
       "args": [],
       "stopAtEntry": false,
-      "externalConsole": true,
-      "cwd": "c:/Users/LEGION/Desktop/webserv42",
-      "program": "c:/Users/LEGION/Desktop/webserv42/build/Debug/outDebug",
+      "externalConsole": false,
+      "cwd": "/home/adam/Desktop/webserv42",
+      "program": "/home/adam/Desktop/webserv42/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
