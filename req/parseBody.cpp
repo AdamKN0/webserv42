@@ -57,7 +57,7 @@ bool HTTPRequest::upload(const Config &config, std::string filename, size_t head
         std::vector<Config::Location> locations = config.getLocations();
         Config::Location location = config.getLocation(location_s);
         if (location.getPath().empty())
-            return (print_message("Location not found in upload", RED), status = 404, false);
+            return (print_message("❌ Location not found in upload", RED), status = 404, false);
         std::vector<std::string> upload = location.getUploadDir();
         if (upload.empty())
             return false;
@@ -66,18 +66,18 @@ bool HTTPRequest::upload(const Config &config, std::string filename, size_t head
         std::vector<std::string> methods = location.getAllowMethods();
         std::vector<std::string>::iterator it = std::find(methods.begin(), methods.end(), "POST");
         if (it == methods.end())
-            return (print_message("You cannot upload files if POST method is not allowed", RED), status = 405, false);
+            return (print_message("🚫 You cannot upload files if POST method is not allowed", RED), status = 405, false);
     }
     struct stat info;
     if (stat(uploadDir.c_str(), &info) != 0 || !(info.st_mode & S_IFDIR))
-        return (print_message("Upload directory does not exist", RED), status = 500, false);
+        return (print_message("❌ Upload directory does not exist", RED), status = 500, false);
     size_t lastSlash = filename.find_last_of('/');
     if (lastSlash != std::string::npos)
         filename = filename.substr(lastSlash + 1);
     std::string filePath = uploadDir + "/" + filename;
     std::ofstream outFile(filePath.c_str(), std::ios::out | std::ios::trunc);
     if (!outFile)
-        return (print_message("Failed to open file for writing", RED), status = 500, false);
+        return (print_message("❌ Failed to open file for writing", RED), status = 500, false);
     size_t body_start = (this->boooooooooody.substr(header_end, 4) == "\r\n\r\n") ? header_end + 4 : header_end + 2;
     this->boooooooooody = this->boooooooooody.substr(body_start);
     if (this->boooooooooody.length() >= 2 && this->boooooooooody.substr(this->boooooooooody.length() - 2) == "\r\n")
@@ -87,9 +87,9 @@ bool HTTPRequest::upload(const Config &config, std::string filename, size_t head
         success = true;
     outFile.close();
     if (success)
-        return(is_upload = true, print_message("File uploaded successfully", GREEN), status = 200, true);
+        return (is_upload = true, print_message("✅ File uploaded successfully", GREEN), status = 200, true);
     else
-        return (print_message("File upload failed", RED), status = 500, false);
+        return (print_message("❌ File upload failed", RED), status = 500, false);
     return true;
 }
 
@@ -117,7 +117,7 @@ void HTTPRequest::parsePart(const Config &config)
             header_line.erase(header_line.size() - 1);
         if (header_line.empty())
         {
-            print_message("Empty header line", RED);
+            print_message("❌ Empty header line", RED);
             status = 400;
             return;
         }
@@ -141,7 +141,7 @@ void HTTPRequest::parsePart(const Config &config)
     {
         if (upload(config, filename, header_end) == false && this->status != 200)
         {
-            print_message("Failed to upload file", RED);
+            print_message("❌ Failed to upload file", RED);
             return;
         }
     }

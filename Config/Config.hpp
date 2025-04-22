@@ -78,5 +78,4 @@ public:
         std::map<int, std::string> getReturn() const;
         std::map<std::string, std::string> getCgi() const;
     };
-    void printConfig(std::vector<Config> &configs) const;
 };

@@ -1,4 +1,5 @@
 #include "CGI.hpp"
+
 CGI::CGI() : env(), cgi_interpreter(), status(200) {}
 CGI::~CGI() {}
 int CGI::getStatus() const { return status; }
@@ -12,7 +13,7 @@ bool CGI::is_cgi(const std::string &path, const Config &config, std::string path
     std::string ext = path.substr(dot_pos);
     Config::Location location = config.getLocation(path_location);
     if (location.getPath().empty())
-        return (print_message("Location not found in config", RED), status = 404, false);
+        return (print_message("❌ Location not found in config", RED), status = 404, false);
     std::vector<std::string> upload = location.getUploadDir();
     if (!upload.empty())
         return false;
@@ -119,20 +120,19 @@ void cleanup_pipes(int *fd_in, int *fd_out)
 }
 bool CGI::exec_cgi(const HTTPRequest &request, std::string &response)
 {
-
     set_env(request);
     const std::string &script_path = request.getPath();
     if (access(script_path.c_str(), F_OK) == -1)
-        return (print_message("Script does not exist: " + script_path, RED), status = 404, false);
+        return (print_message("❌ Script does not exist: " + script_path, RED), status = 404, false);
     if (access(script_path.c_str(), X_OK) == -1)
-        return (print_message("Script is not executable: " + script_path, RED), status = 403, false);
+        return (print_message("🚫 Script is not executable: " + script_path, RED), status = 403, false);
     int fd_in[2] = {-1, -1};
     int fd_out[2] = {-1, -1};
     if (pipe(fd_in) == -1 || pipe(fd_out) == -1)
-        return (print_message("Pipe creation failed", RED), cleanup_pipes(fd_in, fd_out), status = 500, false);
+        return (print_message("❗ Pipe creation failed", RED), cleanup_pipes(fd_in, fd_out), status = 500, false);
     pid_t pid = fork();
     if (pid == -1)
-        return (print_message("Fork failed", RED), cleanup_pipes(fd_in, fd_out), status = 500, false);
+        return (print_message("❗ Fork failed", RED), cleanup_pipes(fd_in, fd_out), status = 500, false);
     if (pid == 0)
     {
         close(fd_in[1]);
@@ -141,14 +141,14 @@ bool CGI::exec_cgi(const HTTPRequest &request, std::string &response)
         {
             if (dup2(fd_in[0], STDIN_FILENO) == -1)
             {
-                print_message("stdin redirection failed", RED);
+                print_message("❌ stdin redirection failed", RED);
                 cleanup_pipes(fd_in, fd_out);
                 exit(EXIT_FAILURE);
             }
         }
         if (dup2(fd_out[1], STDOUT_FILENO) == -1)
         {
-            print_message("stdout redirection failed", RED);
+            print_message("❌ stdout redirection failed", RED);
             cleanup_pipes(fd_in, fd_out);
             exit(EXIT_FAILURE);
         }
@@ -157,7 +157,7 @@ bool CGI::exec_cgi(const HTTPRequest &request, std::string &response)
         char **envp = create_env(env);
         if (!envp)
         {
-            print_message("Environment creation failed", RED);
+            print_message("❗ Environment creation failed", RED);
             cleanup_pipes(fd_in, fd_out);
             exit(EXIT_FAILURE);
         }
@@ -165,7 +165,7 @@ bool CGI::exec_cgi(const HTTPRequest &request, std::string &response)
         const char *interpreter = cgi_interpreter[ext].c_str();
         const char *args[] = {interpreter, script_path.c_str(), NULL};
         execve(interpreter, const_cast<char *const *>(args), envp);
-        print_message("Script execution failed", RED);
+        print_message("❌ Script execution failed", RED);
         for (size_t i = 0; i < env.size(); ++i)
             free(envp[i]);
         delete[] envp;
@@ -180,7 +180,7 @@ bool CGI::exec_cgi(const HTTPRequest &request, std::string &response)
         {
             ssize_t bytes_written = write(fd_in[1], request.getBodyContent().c_str(), request.getBodyContent().length());
             if (bytes_written == -1 || bytes_written < static_cast<ssize_t>(request.getBodyContent().length()))
-                return (print_message("Body write failed", RED), cleanup_pipes(fd_in, fd_out), status = 500, false);
+                return (print_message("❌ Body write failed", RED), cleanup_pipes(fd_in, fd_out), status = 500, false);
         }
         close(fd_in[1]);
         std::string cgi_response;
@@ -192,12 +192,12 @@ bool CGI::exec_cgi(const HTTPRequest &request, std::string &response)
             cgi_response.append(buffer, bytes_read);
         }
         if (bytes_read == -1)
-            return (print_message("Read from CGI script failed", RED), cleanup_pipes(fd_in, fd_out), status = 500, false);
+            return (print_message("❌ Read from CGI script failed", RED), cleanup_pipes(fd_in, fd_out), status = 500, false);
         close(fd_out[0]);
         int status;
         waitpid(pid, &status, 0);
         if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
-            return (print_message("CGI script exited with error status", RED), this->status = 502, false);
+            return (print_message("❌ CGI script exited with error status", RED), this->status = 502, false);
         response = cgi_response;
     }
     cleanup_pipes(fd_in, fd_out);

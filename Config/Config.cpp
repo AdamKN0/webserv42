@@ -166,5 +166,4 @@ void Config::parseConfig(std::ifstream &file)
         print_message("Error: You have no valid server blocks", RED);
         exit(1);
     }
-    // this->printConfig(this->configs);
 }

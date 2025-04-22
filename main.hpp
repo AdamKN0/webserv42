@@ -33,7 +33,7 @@
 #include "Config/Config.hpp"
 #include "req/HTTPRequest.hpp"
 #include "CGI/CGI.hpp"
-#include "runserver.hpp"
+#include "Server/runserver.hpp"
 
 class Run;
 class Connection;
@@ -42,15 +42,13 @@ class Config;
 class HTTPRequest;
 class CGI;
 
-// server part
 
 #define MAX_EVENTS 64
 #define BUFFER_SIZE 4096
-#define KEEP_ALIVE_TIMEOUT 15     // 15 seconds
-#define MAX_UPLOAD_SIZE 100000000 // 100MB
+#define KEEP_ALIVE_TIMEOUT 15
 
-#include "server.hpp"
-#include "connectionHandeling.hpp"
+#include "Server/server.hpp"
+#include "Server/connectionHandeling.hpp"
 class Server;
 class Connection;
 class Run;

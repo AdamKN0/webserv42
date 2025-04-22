@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>405 Method Not Allowed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 900px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .error-code {
+            font-size: 180px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .error-message {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #f8fafc;
+            letter-spacing: -0.5px;
+        }
+        
+        .error-description {
+            font-size: 16px;
+            margin-bottom: 40px;
+            color: #94a3b8;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+        
+        .home-button {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
+        }
+        
+        .home-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(56, 189, 248, 0.4);
+        }
+        
+        .team-grid {
+            position: absolute;
+            bottom: -100px;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 1;
+        }
+        
+        .team-block {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.9;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .team-block:nth-child(1) {
+            background: rgba(56, 189, 248, 0.2);
+            animation-delay: 0s;
+        }
+        
+        .team-block:nth-child(2) {
+            background: rgba(99, 102, 241, 0.2);
+            animation-delay: 0.5s;
+        }
+        
+        .team-block:nth-child(3) {
+            background: rgba(14, 165, 233, 0.2);
+            animation-delay: 1s;
+        }
+        
+        .team-block:nth-child(4) {
+            background: rgba(129, 140, 248, 0.2);
+            animation-delay: 1.5s;
+        }
+        
+        .team-block:nth-child(5) {
+            background: rgba(56, 189, 248, 0.2);
+            animation-delay: 2s;
+        }
+        
+        .team-block:nth-child(6) {
+            background: rgba(99, 102, 241, 0.2);
+            animation-delay: 2.5s;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+        }
+        
+        .error-details {
+            position: relative;
+            z-index: 2;
+            background-color: rgba(15, 23, 42, 0.7);
+            padding: 60px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            margin-bottom: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        
+        .error-subtitle {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #38bdf8;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .glowing-circle {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, rgba(15, 23, 42, 0) 70%);
+            z-index: 0;
+            filter: blur(30px);
+        }
+        
+        .circle-1 {
+            top: -100px;
+            right: -50px;
+        }
+        
+        .circle-2 {
+            bottom: -100px;
+            left: -50px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, rgba(15, 23, 42, 0) 70%);
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="glowing-circle circle-1"></div>
+    <div class="glowing-circle circle-2"></div>
+    
+    <div class="container">
+        <div class="error-details">
+            <div class="error-subtitle">Error Detected</div>
+            <h1 class="error-code">405</h1>
+            <h2 class="error-message">Method Not Allowed</h2>
+            <p class="error-description">
+                The request method is not supported for the requested resource. Please check your request method and try again.
+            </p>
+            <a href="/" class="home-button">Return to Homepage</a>
+        </div>
+        
+        <div class="team-grid">
+            <div class="team-block"></div>
+            <div class="team-block"></div>
+            <div class="team-block"></div>
+            <div class="team-block"></div>
+            <div class="team-block"></div>
+            <div class="team-block"></div>
+        </div>
+    </div>
+</body>
+</html>

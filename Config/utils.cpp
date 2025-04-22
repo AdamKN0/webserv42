@@ -1,6 +1,5 @@
 #include "Tokenizer.hpp"
 
-
 bool is_special_char(char c)
 {
     return (c == '\n' || c == ';' || c == '{' || c == '}' || c == '"' || c == '\'' || c == '#');

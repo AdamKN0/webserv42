@@ -70,14 +70,14 @@ bool HTTPRequest::parseRequestLine(const std::string &line, const Config &config
 {
     std::istringstream iss(line);
     if (!(iss >> method >> path >> http_version))
-        return (print_message("Invalid request: " + line, RED), status = 400, false);
+        return (print_message("❌ Invalid request: " + line, RED), status = 400, false);
     trim(method);
     trim(path);
     trim(http_version);
     if (method != "GET" && method != "POST" && method != "DELETE")
-        return (print_message("Invalid request method: " + method, RED), status = 405, false);
+        return (print_message("🚫 Invalid request method: " + method, RED), status = 405, false);
     if (http_version != "HTTP/1.1")
-        return (print_message("Invalid HTTP version: " + http_version, RED), status = 505, false);
+        return (print_message("❌ Invalid HTTP version: " + http_version, RED), status = 505, false);
     size_t pos = path.find("?");
     if (pos != std::string::npos)
     {
@@ -86,9 +86,7 @@ bool HTTPRequest::parseRequestLine(const std::string &line, const Config &config
     }
     path = urlDecode(path);
     if (path.empty() || path[0] != '/')
-        return (print_message("Invalid path: " + path, RED), status = 404, false);
-    // if (path == "/favicon.ico")
-    //     return true;
+        return (print_message("❌ Invalid path: " + path, RED), status = 404, false);
     if (path[0] == '/')
         path = path.substr(1);
     std::string new_path = path;
@@ -146,7 +144,7 @@ bool HTTPRequest::parseRequestLine(const std::string &line, const Config &config
                 dir += "/";
             Config::Location location = best_location;
             if (location.getPath().empty())
-                return (print_message("Path not found in locationssss: " + dir, RED), status = 404, false);
+                return (print_message("❌ Path not found in locations: " + dir, RED), status = 404, false);
             this->in_location = best_location.getPath();
             std::map<int, std::string> redirection = location.getReturn();
             if (!redirection.empty())
@@ -159,13 +157,13 @@ bool HTTPRequest::parseRequestLine(const std::string &line, const Config &config
             path = new_path;
             std::vector<std::string> methods = location.getAllowMethods();
             if (!methods.empty() && std::find(methods.begin(), methods.end(), method) == methods.end())
-                return (print_message("Method not allowed: " + method, RED), status = 405, false);
+                return (print_message("🚫 Method not allowed: " + method, RED), status = 405, false);
         }
         else if (isValidPath(new_path, true))
         {
             Config::Location location = best_location;
             if (location.getPath().empty())
-                return (print_message("Path not found in locations: " + new_path, RED), status = 404, false);
+                return (print_message("❌ Path not found in locations: " + new_path, RED), status = 404, false);
             this->in_location = best_location.getPath();
             std::map<int, std::string> redirection = location.getReturn();
             if (!redirection.empty())
@@ -184,7 +182,7 @@ bool HTTPRequest::parseRequestLine(const std::string &line, const Config &config
                 {
                     int read_dir = test_dir(new_path, this->autoindex_path, config.getDefaultIndex()[0]);
                     if (read_dir == -1)
-                        return (print_message("Error reading directory", RED), status = 404, false);
+                        return (print_message("❌ Error reading directory", RED), status = 404, false);
                     else if (read_dir == 1)
                     {
                         this->is_autoindex = true;
@@ -194,19 +192,19 @@ bool HTTPRequest::parseRequestLine(const std::string &line, const Config &config
             }
             std::vector<std::string> index = config.getDefaultIndex();
             if (index.empty())
-                return (print_message("No index file found", RED), status = 404, false);
+                return (print_message("❌ No index file found", RED), status = 404, false);
             std::string index_file = new_path + index[0];
             if (!isValidPath(index_file, false))
-                return (print_message("Invalid index file: " + index_file, RED), status = 404, false);
+                return (print_message("❌ Invalid index file: " + index_file, RED), status = 404, false);
             path = index_file;
             std::vector<std::string> methods = location.getAllowMethods();
             if (!methods.empty() && std::find(methods.begin(), methods.end(), method) == methods.end())
-                return (print_message("Method not allowed: " + method, RED), status = 405, false);
+                return (print_message("🚫 Method not allowed: " + method, RED), status = 405, false);
         }
         else
-            return (print_message("Invalid path: " + new_path, RED), status = 404, false);
+            return (print_message("❌ Invalid path: " + new_path, RED), status = 404, false);
     }
     else
-        return (print_message("No location found for path: " + new_path, YELLOW), status = 404, false);
+        return (print_message("⚠️ No location found for path: " + new_path, YELLOW), status = 404, false);
     return true;
 }

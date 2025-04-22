@@ -58,6 +58,5 @@ public:
     std::string getBodyContent() const;
     std::string getContentType() const;
     int getIsMultiPart() const;
-    void print_all();
     std::string getInLocation() const;
 };

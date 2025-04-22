@@ -1,5 +1,5 @@
 #include "main.hpp"
-Run* g_run;
+Run *g_run;
 
 void print_message(std::string message, std::string color)
 {
@@ -8,27 +8,27 @@ void print_message(std::string message, std::string color)
 
 void signal_handler(int sig)
 {
-    std::cout << "Signal " << sig << " received, cleaning up..." << std::endl;
-    if (g_run) {
+    std::cout << YELLOW << "✨ Signal " << sig << " received, cleaning up gracefully! ✨" << RESET << std::endl;
+    if (g_run)
         g_run->cleanup();
-    }
     exit(0);
 }
-int main(int ac, char** av) {
-
+int main(int ac, char **av)
+{
     if (ac != 2)
-        return (print_message("Usage: ./webserv <config_file>", RED), 1);
+        return (print_message("❌ Usage: ./webserv <config_file>", RED), 1);
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
     signal(SIGQUIT, signal_handler);
-
-    try {
+    try
+    {
         Run run(av);
         g_run = &run;
         run.runServer();
-    } catch (const std::exception& e) {
-
-        std::cerr << "Error: " << e.what() << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << RED << "🚨 Error: " << e.what() << " 🚨" << RESET << std::endl;
         return 1;
     }
     return 0;
